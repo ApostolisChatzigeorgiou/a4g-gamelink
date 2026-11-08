@@ -28,12 +28,15 @@
     const params = new URLSearchParams(location.search);
     const id = params.get("id") || "";
     const steamLobbyId = params.get("steam_lobby_id") || "";
+    const steamId = params.get("steam_id") || "";
     const valid = /^[A-Za-z0-9_-]{1,64}$/.test(id);
     const validSteamLobbyId = /^\d{1,25}$/.test(steamLobbyId);
+    const validSteamId = /^7656119\d{10}$/.test(steamId);
     const link = document.getElementById("open");
     if (valid) {
       if (validSteamLobbyId) {
-        link.href = `steam://joinlobby/1934680/${encodeURIComponent(steamLobbyId)}`;
+        const inviter = validSteamId ? `/${encodeURIComponent(steamId)}` : "";
+        link.href = `steam://joinlobby/1934680/${encodeURIComponent(steamLobbyId)}${inviter}`;
         document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το AoM στο lobby.`;
       } else {
         link.href = `mythde://${encodeURIComponent(id)}`;
