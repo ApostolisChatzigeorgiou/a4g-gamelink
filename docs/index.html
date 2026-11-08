@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#17191f">
-  <title>Άνοιγμα AoM lobby</title>
+  <title>Άνοιγμα lobby</title>
   <style>
     :root { color-scheme: dark; font-family: system-ui, sans-serif; }
     body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #17191f; color: #f4f4f5; }
@@ -19,28 +19,36 @@
 </head>
 <body>
   <main>
-    <h1>Άνοιγμα AoM lobby</h1>
-    <p id="details">Πάτησε το κουμπί για να ανοίξει το Age of Mythology: Retold στο lobby.</p>
+    <h1 id="heading">Άνοιγμα lobby</h1>
+    <p id="details">Πάτησε το κουμπί για να ανοίξει το παιχνίδι στο lobby.</p>
     <p id="error" hidden>Ο σύνδεσμος δεν περιέχει έγκυρο Match ID.</p>
     <a id="open" href="#">Άνοιγμα στο παιχνίδι</a>
   </main>
   <script>
     const params = new URLSearchParams(location.search);
     const id = params.get("id") || "";
+    const game = params.get("game") || "aom";
     const steamLobbyId = params.get("steam_lobby_id") || "";
     const steamId = params.get("steam_id") || "";
     const valid = /^[A-Za-z0-9_-]{1,64}$/.test(id);
     const validSteamLobbyId = /^\d{1,25}$/.test(steamLobbyId);
     const validSteamId = /^7656119\d{10}$/.test(steamId);
+    const isAoe4 = game === "aoe4";
+    document.getElementById("heading").textContent = `Άνοιγμα ${isAoe4 ? "AoE4" : "AoM"} lobby`;
     const link = document.getElementById("open");
     if (valid) {
       if (validSteamLobbyId) {
         const inviter = validSteamId ? `/${encodeURIComponent(steamId)}` : "";
-        link.href = `steam://joinlobby/1934680/${encodeURIComponent(steamLobbyId)}${inviter}`;
-        document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το AoM στο lobby.`;
-      } else {
+        const appId = isAoe4 ? "1466860" : "1934680";
+        link.href = `steam://joinlobby/${appId}/${encodeURIComponent(steamLobbyId)}${inviter}`;
+        document.getElementById("details").innerHTML = `Lobby ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το ${isAoe4 ? "AoE4" : "AoM"} στο lobby.`;
+      } else if (!isAoe4) {
         link.href = `mythde://${encodeURIComponent(id)}`;
         document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Αν εμφανιστεί ερώτηση, επίλεξε να ανοίξει το Age of Mythology: Retold.`;
+      } else {
+        link.hidden = true;
+        document.getElementById("error").textContent = "Δεν υπάρχει έγκυρο Steam Lobby ID για άμεση είσοδο.";
+        document.getElementById("error").hidden = false;
       }
     } else {
       link.hidden = true;
