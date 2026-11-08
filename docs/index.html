@@ -25,12 +25,20 @@
     <a id="open" href="#">Άνοιγμα στο παιχνίδι</a>
   </main>
   <script>
-    const id = new URLSearchParams(location.search).get("id") || "";
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id") || "";
+    const steamLobbyId = params.get("steam_lobby_id") || "";
     const valid = /^[A-Za-z0-9_-]{1,64}$/.test(id);
+    const validSteamLobbyId = /^\d{1,25}$/.test(steamLobbyId);
     const link = document.getElementById("open");
     if (valid) {
-      link.href = `mythde://${encodeURIComponent(id)}`;
-      document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Αν εμφανιστεί ερώτηση, επίλεξε να ανοίξει το Age of Mythology: Retold.`;
+      if (validSteamLobbyId) {
+        link.href = `steam://joinlobby/1934680/${encodeURIComponent(steamLobbyId)}`;
+        document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το AoM στο lobby.`;
+      } else {
+        link.href = `mythde://${encodeURIComponent(id)}`;
+        document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Αν εμφανιστεί ερώτηση, επίλεξε να ανοίξει το Age of Mythology: Retold.`;
+      }
     } else {
       link.hidden = true;
       document.getElementById("error").hidden = false;
