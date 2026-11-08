@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17191f">
+  <title>Άνοιγμα AoM lobby</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #17191f; color: #f4f4f5; }
+    main { width: min(90vw, 32rem); box-sizing: border-box; padding: 2rem; border: 1px solid #3b3e48; border-radius: 1rem; background: #22252d; text-align: center; }
+    h1 { font-size: 1.5rem; }
+    p { color: #c5c7ce; line-height: 1.55; }
+    a { display: inline-block; margin-top: 1rem; padding: .9rem 1.2rem; border-radius: .6rem; background: #5865f2; color: white; font-weight: 700; text-decoration: none; }
+    a:hover { background: #4752c4; }
+    code { color: #d9dcff; }
+    #error { color: #ffb4ab; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Άνοιγμα AoM lobby</h1>
+    <p id="details">Πάτησε το κουμπί για να ανοίξει το Age of Mythology: Retold στο lobby.</p>
+    <p id="error" hidden>Ο σύνδεσμος δεν περιέχει έγκυρο Match ID.</p>
+    <a id="open" href="#">Άνοιγμα στο παιχνίδι</a>
+  </main>
+  <script>
+    const id = new URLSearchParams(location.search).get("id") || "";
+    const valid = /^[A-Za-z0-9_-]{1,64}$/.test(id);
+    const link = document.getElementById("open");
+    if (valid) {
+      link.href = `mythde://${encodeURIComponent(id)}`;
+      document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Αν εμφανιστεί ερώτηση, επίλεξε να ανοίξει το Age of Mythology: Retold.`;
+    } else {
+      link.hidden = true;
+      document.getElementById("error").hidden = false;
+    }
+  </script>
+</body>
+</html>
