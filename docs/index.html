@@ -30,24 +30,38 @@
     const game = params.get("game") || "aom";
     const steamLobbyId = params.get("steam_lobby_id") || "";
     const steamId = params.get("steam_id") || "";
+    const appId = params.get("app_id") || "";
     const valid = /^[A-Za-z0-9_-]{1,64}$/.test(id);
     const validSteamLobbyId = /^\d{1,25}$/.test(steamLobbyId);
     const validSteamId = /^7656119\d{10}$/.test(steamId);
-    const isAoe4 = game === "aoe4";
-    document.getElementById("heading").textContent = `Άνοιγμα ${isAoe4 ? "AoE4" : "AoM"} lobby`;
+    const gameNames = { aom: "AoM", aoe2: "AoE2 DE", aoe3: "AoE3 DE", aoe4: "AoE4" };
+    const supportedAppIds = { aom: "1934680", aoe2: "813780", aoe3: "933110", aoe4: "1466860" };
+    const gameName = gameNames[game] || "παιχνιδιού";
+    document.getElementById("heading").textContent = `Άνοιγμα ${gameName} lobby`;
     const link = document.getElementById("open");
     if (valid) {
       if (validSteamLobbyId) {
         const inviter = validSteamId ? `/${encodeURIComponent(steamId)}` : "";
-        const appId = isAoe4 ? "1466860" : "1934680";
-        link.href = `steam://joinlobby/${appId}/${encodeURIComponent(steamLobbyId)}${inviter}`;
-        document.getElementById("details").innerHTML = `Lobby ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το ${isAoe4 ? "AoE4" : "AoM"} στο lobby.`;
-      } else if (!isAoe4) {
+        if (supportedAppIds[game] === appId) {
+          link.href = `steam://joinlobby/${appId}/${encodeURIComponent(steamLobbyId)}${inviter}`;
+          document.getElementById("details").innerHTML = `Lobby ID: <code>${id}</code>. Το Steam θα προσπαθήσει να ανοίξει το ${gameName} στο lobby.`;
+        } else {
+          link.hidden = true;
+          document.getElementById("error").textContent = "Ο σύνδεσμος δεν περιέχει έγκυρο παιχνίδι.";
+          document.getElementById("error").hidden = false;
+        }
+      } else if (game === "aom") {
         link.href = `mythde://${encodeURIComponent(id)}`;
         document.getElementById("details").innerHTML = `Match ID: <code>${id}</code>. Αν εμφανιστεί ερώτηση, επίλεξε να ανοίξει το Age of Mythology: Retold.`;
+      } else if (game === "aoe2") {
+        link.href = `aoe2de://0/${encodeURIComponent(id)}`;
+        document.getElementById("details").innerHTML = `Lobby ID: <code>${id}</code>. Θα ανοίξει το AoE2 DE. Αν δεν ανοίξει αυτόματα, άνοιξε πρώτα το παιχνίδι.`;
+      } else if (game === "aoe3") {
+        link.href = `aoe3de://${encodeURIComponent(id)}`;
+        document.getElementById("details").innerHTML = `Lobby ID: <code>${id}</code>. Θα ανοίξει το AoE3 DE. Αν δεν ανοίξει αυτόματα, άνοιξε πρώτα το παιχνίδι.`;
       } else {
         link.hidden = true;
-        document.getElementById("error").textContent = "Δεν υπάρχει έγκυρο Steam Lobby ID για άμεση είσοδο.";
+        document.getElementById("error").textContent = "Δεν υπάρχει Steam Lobby ID για άμεση είσοδο.";
         document.getElementById("error").hidden = false;
       }
     } else {
